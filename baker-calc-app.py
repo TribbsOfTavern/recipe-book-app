@@ -6,7 +6,7 @@ import json
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-    
+
 class Application(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -29,12 +29,24 @@ class Application(tk.Tk):
         
         # File menu
         filemenu = tk.Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label="New", command=lambda: self.menubarFileNew())
-        filemenu.add_command(label="Open", command=lambda: self.menubarFileOpen())
-        filemenu.add_command(label="Save", command=lambda: self.menubarFileSave())
+        filemenu.add_command(label="New Book", command=lambda: self.menubarFileNew())
+        filemenu.add_command(label="Open Book", command=lambda: self.menubarFileOpen())
+        filemenu.add_command(label="Save Book", command=lambda: self.menubarFileSave())
+        filemenu.add_separator()
+        filemenu.add_command(label="Print to File", command=lambda: self.menubarPrint)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=lambda: self.closeApp())
+        
+        recipemenu = tk.Menu(self.menubar, tearoff=0)
+        recipemenu.add_command(label="New Ingredient", command=lambda: self.recipemenuNewIngredient())
+        recipemenu.add_command(label="Edit Ingredient", command=lambda: self.recipemenuEditIngredient())
+        recipemenu.add_command(label="Remove Ingredient", command=lambda: self.recipemenuRemoveIngredient())
+        recipemenu.add_separator()
+        recipemenu.add_command(label="New Recipe", command=lambda: self.recipemenuNewRecipe())
+        recipemenu.add_command(label="Remove Recipe", command=lambda: self.recipemenuRemoveRecipe())
+        
         self.menubar.add_cascade(label="File", menu=filemenu)
+        self.menubar.add_cascade(label="Recipe", menu=recipemenu)
         
         self.config(menu=self.menubar)
 
@@ -70,6 +82,21 @@ class Application(tk.Tk):
         
     def menubarFileSave(self):
         print("File > Save > Clicked")
+    
+    def recipemenuNewIngredient(self):
+        print("Recipe > New Ingredient > Clicked")
+    
+    def recipemenuEditIngredient(self):
+        print("Recipe > Edit Ingredient > Clicked")
+        
+    def recipemenuRemoveIngredient(self):
+        print("Recipe > Remove Ingredient > Clicked")
+        
+    def recipemenuNewRecipe(self):
+        print("Recipe > New Recipe > Clicked")
+        
+    def recipemenuRemoveRecipe(self):
+        print("Recipe > Remove Recipe > Clicked")
     
     def  closeApp(self):
         self.destroy()
@@ -107,7 +134,7 @@ class FrameListRecipes(tk.Frame):
         
         self.treeview_selected_recipe = ttk.Treeview(self.panel_recipe_text,
                                                 columns=("ingredient", "amount", "units", "cost"),
-                                                show="headings", selectmode="none")
+                                                show="headings", selectmode="browse")
         self.treeview_selected_recipe.heading("ingredient", text="Ingredient")
         self.treeview_selected_recipe.heading("amount", text="Amount")
         self.treeview_selected_recipe.heading("units", text="Units")
@@ -179,17 +206,14 @@ class FrameListRecipes(tk.Frame):
     def updateRecipeView(self, recipe):
         self.treeview_selected_recipe.delete(*self.treeview_selected_recipe.get_children())
         for ingredient in self.recipe_book[recipe]:
-            print(ingredient)
             self.treeview_selected_recipe.insert("", tk.END, 
                 values=(ingredient['name'], ingredient['amount'], ingredient['unit'], ingredient['cost'],)
             )
             
-    
 class FrameEditRecipe(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
-        master.title("Edit Recipe")
-        
+        master.title("Edit Recipe")        
 
 if __name__ == "__main__":
     app = Application()
