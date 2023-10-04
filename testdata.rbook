@@ -1,0 +1,48 @@
+{
+    "CodeNameTribbs Stream": [
+        {
+            "name": "ingredient 1",
+            "amount": "some",
+            "unit": "grams",
+            "cost": "none"
+        },
+        {
+            "name": "diced chat",
+            "amount": "all",
+            "unit": "viewers",
+            "cost": "everything"
+        },
+        {
+            "name": "time",
+            "amount": "a lot",
+            "unit": "hours",
+            "cost": "infinate"
+        }
+    ],
+    "Basic Dinner": [
+        {
+            "name": "potatoes",
+            "amount": "heaft serving",
+            "unit": "spoons",
+            "cost": "a bit"
+        },
+        {
+            "name": "ground beef",
+            "amount": "a bit",
+            "unit": "lbs.",
+            "cost": "pricey"
+        },
+        {
+            "name": "green beens",
+            "amount": "fair bit",
+            "unit": "spoons",
+            "cost": "alright amount"
+        },
+        {
+            "name": "brown gravy",
+            "amount": "just enough",
+            "unit": "spoons",
+            "cost": "not so much"
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+Baking/Cooking Calculator
+
+Objectives:
+> Tkinter GUI
+> Add recipes
+> Save recipes
+> View and Select Different Recipes
+> Each recipe can add ingredients
+> Each ingrtedient has an amount
+> Convert amount types
+> Each recipe has a yield
+> Increase and Decrease the yield, updating ingredient amounts
+> Not using database
+> Recipes can be printed to a text file in human readability
+
