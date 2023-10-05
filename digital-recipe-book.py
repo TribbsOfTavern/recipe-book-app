@@ -9,6 +9,15 @@ from tkinter import filedialog
 
 def app():
     # App Functions
+    def  getRootPos():
+        nonlocal root
+        return {
+            "x": root.winfo_x(),
+            "y": root.winfo_y(),
+            "width": root.winfo_width(),
+            "height": root.winfo_height()
+        }
+    
     def menuNewBook():
         nonlocal recipe_book
         nonlocal selected_ingredient
@@ -53,7 +62,9 @@ def app():
         nonlocal root
         window = tk.Toplevel(root)
         window.title("Add Ingredient...")
-        window.geometry("400x100")
+        r_pos = getRootPos()
+        size = f"400x100+{int(r_pos['x'] + r_pos['width']/2) - 200}+{int(r_pos['y'] + r_pos['height']/2) - 50}"
+        window.geometry(size)
         window.grid_columnconfigure(0, weight=1)
         window.grid_columnconfigure(1, weight=1)
         window.grid_columnconfigure(2, weight=1)
@@ -119,7 +130,9 @@ def app():
         
         window = tk.Toplevel(root)
         window.title("Edit Ingredient...")
-        window.geometry("400x100")
+        r_pos = getRootPos()
+        size = f"400x100+{int(r_pos['x'] + r_pos['width']/2) - 200}+{int(r_pos['y'] + r_pos['height']/2) - 50}"
+        window.geometry(size)
         window.grid_columnconfigure(0, weight=1)
         window.grid_columnconfigure(1, weight=1)
         window.grid_columnconfigure(2, weight=1)
@@ -208,7 +221,12 @@ def app():
         nonlocal root
         window = tk.Toplevel(root)
         window.title("Add Ingredient...")
+        r_pos = getRootPos()
+        size = f"250x50+{int(r_pos['x'] + r_pos['width']/2) - 125}+{int(r_pos['y'] + r_pos['height']/2) - 25}"
+        window.geometry(size)
         window.geometry("250x50")
+        window.resizable(False, False)
+        
         window.grid_columnconfigure(0, weight=1)
         window.grid_columnconfigure(1, weight=2)
         window.grid_columnconfigure(2, weight=1)
@@ -301,16 +319,25 @@ def app():
             "cost": current_recipe.item(selected_ingredient[0])['values'][3]
         }
         ingredient_index = recipe_book[selected_recipe].index(index_search)
-    
-        recipe_book[selected_recipe][ingredient_index] = {
-            "name": ingredient["name"],
-            "amount": ingredient["amount"],
-            "unit": ingredient["unit"],
-            "cost": ingredient["cost"]
-        }
+        
+        recipe_book[selected_recipe][ingredient_index] = constructIngredent(
+            ingredient["name"],
+            ingredient["amount"],
+            ingredient["unit"],
+            ingredient["cost"]
+        )
         
         window.destroy()
         updateCurrentRecipe()
+    
+    def constructIngredent(name, amount, unit, cost) -> dict:
+        ingredient = {
+            "name": str(name),
+            "amount": str(amount),
+            "unit": str(unit),
+            "cost": str(cost)
+        }
+        return ingredient
     
     def setMenuStates():
         #TODO hanfling menu states based on states of app
