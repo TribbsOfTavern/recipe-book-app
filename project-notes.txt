@@ -3,7 +3,7 @@ Baking/Cooking Calculator
 Objectives:
 > Tkinter GUI
 > Add recipes
-> Save recipes
+> Save recipes to .rbook
 > View and Select Different Recipes
 > Each recipe can add ingredients
 > Each ingrtedient has an amount
@@ -12,4 +12,3 @@ Objectives:
 > Increase and Decrease the yield, updating ingredient amounts
 > Not using database
 > Recipes can be printed to a text file in human readability
-
