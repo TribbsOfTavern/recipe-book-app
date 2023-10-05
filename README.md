@@ -18,12 +18,12 @@ I tried to make this pretty simple to use and all functionaly is currently in th
 ---
 ### TODOs List
  - [x] Learning Tkinter GUI
- - [ ] New Recipe Book
+ - [x] New Recipe Book
  - [x] Load Recipe Book
- - [ ] Save Recipe Book
- - [ ] Add Recipe
- - [ ] Edit Recipe
- - [ ] Remove Recipe
+ - [x] Save Recipe Book
+ - [x] Add Recipe
+ - [x] Edit Recipe
+ - [x] Remove Recipe
  - [ ] Adjust Recipe Yield
  - [ ] Print Current Recipe To File
  - [ ] ? Menu Shortcuts

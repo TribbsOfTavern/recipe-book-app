@@ -1,48 +1,36 @@
 {
-    "CodeNameTribbs Stream": [
+    "Stream Chat Stew": [
         {
-            "name": "ingredient 1",
-            "amount": "some",
-            "unit": "grams",
-            "cost": "none"
+            "name": "Diced Chatters",
+            "amount": "Handful",
+            "unit": "2",
+            "cost": "limitless"
         },
         {
-            "name": "diced chat",
-            "amount": "all",
-            "unit": "viewers",
-            "cost": "everything"
+            "name": "Fresh Raiders",
+            "amount": "3",
+            "unit": "Scoops",
+            "cost": "priceless"
         },
         {
-            "name": "time",
-            "amount": "a lot",
-            "unit": "hours",
-            "cost": "infinate"
+            "name": "Ground Lurkers",
+            "amount": "4",
+            "unit": "Scoop",
+            "cost": "more than I have"
         }
     ],
-    "Basic Dinner": [
+    "Some Recipe": [
         {
-            "name": "potatoes",
-            "amount": "heaft serving",
-            "unit": "spoons",
-            "cost": "a bit"
+            "name": "Item 1",
+            "amount": "4",
+            "unit": "grams",
+            "cost": "1"
         },
         {
-            "name": "ground beef",
-            "amount": "a bit",
-            "unit": "lbs.",
-            "cost": "pricey"
-        },
-        {
-            "name": "green beens",
-            "amount": "fair bit",
-            "unit": "spoons",
-            "cost": "alright amount"
-        },
-        {
-            "name": "brown gravy",
-            "amount": "just enough",
-            "unit": "spoons",
-            "cost": "not so much"
+            "name": "Item 2",
+            "amount": "1",
+            "unit": "cup",
+            "cost": "2"
         }
     ]
 }
