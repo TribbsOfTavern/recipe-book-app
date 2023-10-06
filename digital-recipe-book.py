@@ -33,7 +33,6 @@ def app():
         }
         return ingredient
     
-    
     def menuNewBook():
         nonlocal recipe_book
         nonlocal selected_ingredient
