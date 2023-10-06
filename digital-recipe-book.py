@@ -70,6 +70,10 @@ def app():
                 json.dump(recipe_book, fo, indent=4)
 
     def menuPrintToFile():
+        #TODO 
+        # Current Recipe Needs to Be Formated Nicely and
+        # Saved To A Text File With Recipe Name
+        #
         pass
 
     def menuExitApp():
@@ -318,6 +322,15 @@ def app():
         
         updateMenuStates()
     
+    def menuEvent(event=None, action=""):
+        match action:
+            case "new_book": menuNewBook()
+            case "open_book": menuOpenBook()
+            case "save_book": menuSaveBook()
+            case "print_recipe": menuPrintToFile()
+            case "quit_app": menuExitApp()
+            case "new_recipe": menuRecipeNew()
+    
     def _addRecipe(window, recipe):
         nonlocal recipe_book
         recipe_book[recipe] = []
@@ -409,31 +422,39 @@ def app():
     menubar = tk.Menu()
     
     filemenu = tk.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="New Book", command=menuNewBook)
-    filemenu.add_command(label="Open Book", command=menuOpenBook)
-    filemenu.add_command(label="Save Book", command=menuSaveBook)
+    filemenu.add_command(label="New Book", command=menuNewBook, accelerator="Ctrl+n")
+    filemenu.add_command(label="Open Book", command=menuOpenBook, accelerator="Ctrl+o")
+    filemenu.add_command(label="Save Book", command=menuSaveBook, accelerator="Ctrl+s")
     filemenu.add_separator()
-    filemenu.add_command(label="Print To File", command=menuPrintToFile)
+    filemenu.add_command(label="Print To File", command=menuPrintToFile, accelerator="Ctrl+p")
     filemenu.add_separator()
-    filemenu.add_command(label="Exit", command=menuExitApp)
+    filemenu.add_command(label="Exit", command=menuExitApp, accelerator="Ctrl+q")
     
     recipemenu = tk.Menu(menubar, tearoff=0)
     recipemenu.add_command(label="Add Ingredient", command=menuIngredientAdd)
     recipemenu.add_command(label="Edit Ingredient", command=menuIngredientEdit)
     recipemenu.add_command(label="Remove Ingredient", command=menuIngredientRemove)
     recipemenu.add_separator()
-    recipemenu.add_command(label="New Recipe", command=menuRecipeNew)
+    recipemenu.add_command(label="New Recipe", command=menuRecipeNew, accelerator="Ctrl+r")
     recipemenu.add_command(label="Remove Recipe", command=menuRecipeRemove)
     
     #debugmenu to be removed when finished
     debugmenu = tk.Menu(menubar, tearoff=0)
     debugmenu.add_command(label="Print recipe_book var", command=debug_PrintRecipeBook)
+    debugmenu.add_command(label="Menu Event", command=menuEvent, accelerator="Ctrl+d")
     
     menubar.add_cascade(label="File", menu=filemenu)
     menubar.add_cascade(label="Recipe", menu=recipemenu)
     menubar.add_cascade(label="Debug", menu=debugmenu)
-     
+    
     root.config(menu=menubar)
+    root.bind_all('<Control-n>', lambda event: menuEvent(event, "new_book"),)
+    root.bind_all('<Control-o>', lambda event: menuEvent(event, "open_book"))
+    root.bind_all('<Control-s>', lambda event: menuEvent(event, "save_book"))
+    root.bind_all('<Control-p>', lambda event: menuEvent(event, "print_recipe"))
+    root.bind_all('<Control-q>', lambda event: menuEvent(event, "quit_app"))
+    root.bind_all('<Control-r>', lambda event: menuEvent(event, "new_recipe"))
+    root.bind_all('<Control-d>', lambda event: menuEvent(event, "something"))
     
     # panel frames
     panel_recipes_list = tk.Frame(root)
