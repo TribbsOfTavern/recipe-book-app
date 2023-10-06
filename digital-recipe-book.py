@@ -9,6 +9,12 @@ from tkinter import filedialog
 
 def app():
     # App Functions
+    def debug_PrintRecipeBook():
+        nonlocal recipe_book
+        if recipe_book:
+            for k, v in recipe_book.items():
+                print(f"{k}:{v}")
+                
     def  getRootPos():
         nonlocal root
         return {
@@ -17,6 +23,16 @@ def app():
             "width": root.winfo_width(),
             "height": root.winfo_height()
         }
+    
+    def constructIngredent(name, amount, unit, cost) -> dict:
+        ingredient = {
+            "name": str(name),
+            "amount": str(amount),
+            "unit": str(unit),
+            "cost": str(cost)
+        }
+        return ingredient
+    
     
     def menuNewBook():
         nonlocal recipe_book
@@ -101,8 +117,10 @@ def app():
         panel_controls.grid_propagate(True)
         # Add Button (Submit)
         btn_add = tk.Button(panel_controls, text="Add Ingredient",
-            command=lambda: _addIngredient(window, {"name": ent_ingredient.get(), "amount": ent_amount.get(),
-                                            "unit": ent_units.get(), "cost": ent_cost.get()})
+            command=lambda: _addIngredient(
+                window, 
+                constructIngredent(ent_ingredient.get(), ent_amount.get(), ent_units.get(), ent_cost.get())
+            )
         )
         btn_add.grid_propagate(True)
         # Cancel Button
@@ -173,8 +191,10 @@ def app():
         panel_controls.grid_propagate(True)
         # Add Button (Submit)
         btn_add = tk.Button(panel_controls, text="Update Ingredient",
-            command=lambda: _updateIngredient(window, {"name": ent_ingredient.get(), "amount": ent_amount.get(),
-                                            "unit": ent_units.get(), "cost": ent_cost.get()})
+            command=lambda: _updateIngredient(
+                window,
+                constructIngredent(ent_ingredient.get(), ent_amount.get(), ent_units(), ent_cost())
+            )
         )
         btn_add.grid_propagate(True)
         # Cancel Button
@@ -201,12 +221,12 @@ def app():
         nonlocal selected_recipe
         
         #remove the ingredient from the recipe in recipe_book
-        index_search = {
-            "name": current_recipe.item(selected_ingredient[0])['values'][0],
-            "amount": current_recipe.item(selected_ingredient[0])['values'][1],
-            "unit": current_recipe.item(selected_ingredient[0])['values'][2],
-            "cost": current_recipe.item(selected_ingredient[0])['values'][3]
-        }
+        index_search = constructIngredent(
+            current_recipe.item(selected_ingredient[0])['values'][0], # name
+            current_recipe.item(selected_ingredient[0])['values'][1], # amount
+            current_recipe.item(selected_ingredient[0])['values'][2], # unit
+            current_recipe.item(selected_ingredient[0])['values'][3]  # cost
+        )
         ingredient_index = recipe_book[selected_recipe].index(index_search)
         del recipe_book[selected_recipe][ingredient_index]
         
@@ -245,10 +265,12 @@ def app():
     def menuRecipeRemove():
         nonlocal recipe_book
         nonlocal selected_recipe
+        nonlocal current_recipe
         if selected_recipe:
             del recipe_book[selected_recipe]
             selected_recipe = None
             updateRecipeList()
+        current_recipe.delete(*current_recipe.get_children())
 
     def updateRecipeList():
         recipes_list.delete(*recipes_list.get_children())
@@ -277,6 +299,8 @@ def app():
         if recipes_list.selection():
             selected_recipe = recipes_list.item(recipes_list.selection()[0])['values'][0]
             updateCurrentRecipe()
+        
+        updateMenuStates()
             
     def onIngredientSelected(event):
         nonlocal selected_ingredient
@@ -286,6 +310,8 @@ def app():
         if current_recipe.selection():
             selected_ingredient = current_recipe.selection()
             updateRecipeList()
+        
+        updateMenuStates()
     
     def _addRecipe(window, recipe):
         nonlocal recipe_book
@@ -294,54 +320,53 @@ def app():
         
         updateRecipeList()
     
-    def _addIngredient(window, ingredient):
+    def _addIngredient(window, ing_dict):
         nonlocal current_recipe
         nonlocal recipe_book
         nonlocal selected_recipe
         
-        if ingredient:
-            recipe_book[selected_recipe].append(ingredient)
+        if ing_dict:
+            recipe_book[selected_recipe].append(ing_dict)
             current_recipe.insert("", tk.END,
-                value=(ingredient["name"], ingredient["amount"], ingredient["unit"], ingredient["cost"],)                      
+                value=(ing_dict["name"], ing_dict["amount"], ing_dict["unit"], ing_dict["cost"],)                      
             )
             window.destroy()
     
-    def _updateIngredient(window, ingredient):
+    def _updateIngredient(window, ing_dict):
         nonlocal current_recipe
         nonlocal recipe_book
         nonlocal selected_ingredient
         nonlocal selected_recipe
         
-        index_search = {
-            "name": current_recipe.item(selected_ingredient[0])['values'][0],
-            "amount": current_recipe.item(selected_ingredient[0])['values'][1],
-            "unit": current_recipe.item(selected_ingredient[0])['values'][2],
-            "cost": current_recipe.item(selected_ingredient[0])['values'][3]
-        }
+        index_search = constructIngredent(
+            current_recipe.item(selected_ingredient[0])['values'][0], # name
+            current_recipe.item(selected_ingredient[0])['values'][1], # amount
+            current_recipe.item(selected_ingredient[0])['values'][2], # unit
+            current_recipe.item(selected_ingredient[0])['values'][3]  # cost
+        )
         ingredient_index = recipe_book[selected_recipe].index(index_search)
         
-        recipe_book[selected_recipe][ingredient_index] = constructIngredent(
-            ingredient["name"],
-            ingredient["amount"],
-            ingredient["unit"],
-            ingredient["cost"]
-        )
+        recipe_book[selected_recipe][ingredient_index] = ing_dict
         
         window.destroy()
         updateCurrentRecipe()
     
-    def constructIngredent(name, amount, unit, cost) -> dict:
-        ingredient = {
-            "name": str(name),
-            "amount": str(amount),
-            "unit": str(unit),
-            "cost": str(cost)
-        }
-        return ingredient
-    
-    def setMenuStates():
-        #TODO hanfling menu states based on states of app
-        pass
+    def updateMenuStates():
+        if selected_ingredient:
+            recipemenu.entryconfig("Edit Ingredient", state="normal")
+            recipemenu.entryconfig("Remove Ingredient", state="normal")
+        if not selected_ingredient:
+            recipemenu.entryconfig("Edit Ingredient", state="disabled")
+            recipemenu.entryconfig("Remove Ingredient", state="disabled")
+        if selected_recipe:
+            recipemenu.entryconfig("Add Ingredient", state="normal")
+            recipemenu.entryconfig("Remove Recipe", state="normal")
+            filemenu.entryconfig("Print To File", state="normal")
+        if not selected_recipe:
+            recipemenu.entryconfig("Add Ingredient", state="disabled")
+            recipemenu.entryconfig("Remove Recipe", state="disabled")    
+            filemenu.entryconfig("Print To File", state="disabled")
+        
         
     # App variables
     recipe_book = {}
@@ -377,9 +402,14 @@ def app():
     recipemenu.add_command(label="New Recipe", command=menuRecipeNew)
     recipemenu.add_command(label="Remove Recipe", command=menuRecipeRemove)
     
+    #debugmenu to be removed when finished
+    debugmenu = tk.Menu(menubar, tearoff=0)
+    debugmenu.add_command(label="Print recipe_book var", command=debug_PrintRecipeBook)
+    
     menubar.add_cascade(label="File", menu=filemenu)
     menubar.add_cascade(label="Recipe", menu=recipemenu)
-    
+    menubar.add_cascade(label="Debug", menu=debugmenu)
+     
     root.config(menu=menubar)
     
     # panel frames
@@ -429,9 +459,8 @@ def app():
     panel_recipes_list.grid(sticky="nsew", row=1, column=0, padx=2, pady=2)
     panel_current_recipe.grid(sticky="nsew", row=1, column=1, padx=2, pady=2)
     
-    setMenuStates()
+    updateMenuStates()
     root.mainloop()
-    
     
 if __name__ == "__main__":
     app()
