@@ -74,7 +74,27 @@ def app():
         # Current Recipe Needs to Be Formated Nicely and
         # Saved To A Text File With Recipe Name
         #
-        pass
+        nonlocal selected_recipe
+        nonlocal current_recipe
+        nonlocal ent_current_yield
+        
+        if selected_recipe:
+            file = filedialog.asksaveasfile(
+                mode="w", 
+                initialdir="./", 
+                filetypes=(("Plain Text File", "*.txt"),),
+                defaultextension=".txt",
+                initialfile=f"{selected_recipe}")
+            output = []
+            output.append(f"{selected_recipe:<30} Yeild: {ent_current_yield.get():<5}")
+            for id in current_recipe.get_children():
+                name = current_recipe.item(id)['values'][0]
+                amount = current_recipe.item(id)['values'][1]
+                unit = current_recipe.item(id)['values'][2]
+                text = f"{amount:>5} {unit:.<15} {name}"
+                output.append(text)
+            file.write('\n'.join(output))
+            file.close()
 
     def menuExitApp():
         root.destroy()
@@ -403,7 +423,6 @@ def app():
             recipemenu.entryconfig("Remove Recipe", state="disabled")    
             filemenu.entryconfig("Print To File", state="disabled")
         
-        
     # App variables
     recipe_book = {}
     selected_recipe = None
@@ -445,7 +464,6 @@ def app():
     
     menubar.add_cascade(label="File", menu=filemenu)
     menubar.add_cascade(label="Recipe", menu=recipemenu)
-    menubar.add_cascade(label="Debug", menu=debugmenu)
     
     root.config(menu=menubar)
     root.bind_all('<Control-n>', lambda event: menuEvent(event, "new_book"),)
@@ -454,7 +472,6 @@ def app():
     root.bind_all('<Control-p>', lambda event: menuEvent(event, "print_recipe"))
     root.bind_all('<Control-q>', lambda event: menuEvent(event, "quit_app"))
     root.bind_all('<Control-r>', lambda event: menuEvent(event, "new_recipe"))
-    root.bind_all('<Control-d>', lambda event: menuEvent(event, "something"))
     
     # panel frames
     panel_recipes_list = tk.Frame(root)
