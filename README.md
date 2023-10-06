@@ -25,8 +25,8 @@ I tried to make this pretty simple to use and all functionaly is currently in th
  - [x] Edit Recipe
  - [x] Remove Recipe
  - [x] Adjust Recipe Yield
- - [ ] Write New Yield To Recipe Book
+ - [x] Write New Yield To Recipe Book
  - [x] Print Current Recipe To File
  - [x] ? Menu Shortcuts
- - [ ] ? Cost Scaling
- - [ ] ? Recipe Instructions
+- [ ] ? Cost Scaling
+ - [x] ? Recipe Instructions

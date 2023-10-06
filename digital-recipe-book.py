@@ -37,7 +37,10 @@ def app():
         nonlocal recipe_book
         nonlocal selected_ingredient
         nonlocal selected_recipe
-        recipe_book = {}
+        recipe_book = {
+            "_yields": {},
+            "_steps": {}
+        }
         selected_recipe = None
         selected_ingredient = None
         
@@ -59,7 +62,6 @@ def app():
             updateRecipeList()
     
     def menuSaveBook():
-        # TODO test saving funcationality
         nonlocal recipe_book
         filepath = filedialog.asksaveasfilename(
             initialdir="./",
@@ -70,13 +72,10 @@ def app():
                 json.dump(recipe_book, fo, indent=4)
 
     def menuPrintToFile():
-        #TODO 
-        # Current Recipe Needs to Be Formated Nicely and
-        # Saved To A Text File With Recipe Name
-        #
         nonlocal selected_recipe
         nonlocal current_recipe
         nonlocal ent_current_yield
+        nonlocal text_recipe_instruction
         
         if selected_recipe:
             file = filedialog.asksaveasfile(
@@ -93,7 +92,12 @@ def app():
                 unit = current_recipe.item(id)['values'][2]
                 text = f"{amount:>5} {unit:.<15} {name}"
                 output.append(text)
-            file.write('\n'.join(output))
+            
+            if selected_recipe in recipe_book['_steps'].keys():
+                text = '\n'.join(output) + '\n\nInstructions:\n' + text_recipe_instruction.get('1.0', tk.END)
+                file.write(text)
+            else:
+                file.write('\n'.join(output))
             file.close()
 
     def menuExitApp():
@@ -238,7 +242,26 @@ def app():
         btn_add.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
         btn_cancel.grid(row=0, column=1, sticky="nsew", padx=2, pady=2)
         panel_controls.grid(row=2, column=0, columnspan=4, sticky="nsew")
+    
+    def menuIngredientSave():
+        nonlocal selected_recipe
+        nonlocal current_recipe
+        nonlocal ent_current_yield
+        nonlocal text_recipe_instruction
         
+        if selected_recipe:
+            ingredients = []
+            for id in current_recipe.get_children():
+                name = current_recipe.item(id)['values'][0]
+                amount = current_recipe.item(id)['values'][1]
+                unit = current_recipe.item(id)['values'][2]
+                cost = current_recipe.item(id)['values'][3]
+                ingredients.append(constructIngredent(name, amount, unit, cost))
+                
+            recipe_book[selected_recipe] = ingredients
+            recipe_book['_yields'][selected_recipe] = ent_current_yield.get()
+            recipe_book['_steps'][selected_recipe] = text_recipe_instruction.get('1.0', tk.END)
+    
     def menuIngredientRemove():
         nonlocal selected_ingredient
         nonlocal current_recipe
@@ -293,14 +316,17 @@ def app():
         nonlocal current_recipe
         if selected_recipe:
             del recipe_book[selected_recipe]
+            del recipe_book['_yields'][selected_recipe]
+            del recipe_book['_steps'][selected_recipe]
             selected_recipe = None
             updateRecipeList()
         current_recipe.delete(*current_recipe.get_children())
+        
 
     def updateRecipeList():
         recipes_list.delete(*recipes_list.get_children())
         for recipe in recipe_book:
-            if recipe != "_yields":
+            if recipe != "_yields" and recipe != "_steps":
                 recipes_list.insert("", tk.END, values=(recipe,))
     
     def updateCurrentRecipe():
@@ -309,21 +335,29 @@ def app():
         nonlocal current_recipe
         nonlocal lbl_current_recipe
         nonlocal ent_current_yield
+        nonlocal text_recipe_instruction
         
         current_recipe.delete(*current_recipe.get_children())
-        for ingredient in recipe_book[selected_recipe]:
-            current_recipe.insert("", tk.END,
-                value=(ingredient["name"], ingredient["amount"], ingredient["unit"], ingredient["cost"],)                      
-            )
+        if recipe_book:
+            for ingredient in recipe_book[selected_recipe]:
+                current_recipe.insert("", tk.END,
+                    value=(ingredient["name"], ingredient["amount"], ingredient["unit"], ingredient["cost"],)                      
+                )
         text = f"Current Recipe: {selected_recipe}"
         lbl_current_recipe.config(text=text)
         ent_current_yield.delete(0, tk.END)
-        ent_current_yield.insert(0, recipe_book["_yields"][selected_recipe])    
+        ent_current_yield.insert(0, recipe_book["_yields"][selected_recipe])
+        if selected_recipe in recipe_book['_steps'].keys():
+            text_recipe_instruction.delete('1.0', tk.END)
+            text_recipe_instruction.insert('1.0', recipe_book['_steps'][selected_recipe])
             
     def onRecipeSelected(event):
         nonlocal selected_recipe
         nonlocal recipe_book
         nonlocal recipes_list
+        nonlocal text_recipe_instruction
+        
+        text_recipe_instruction.delete('1.0', tk.END)
         
         if recipes_list.selection():
             selected_recipe = recipes_list.item(recipes_list.selection()[0])['values'][0]
@@ -350,6 +384,7 @@ def app():
             case "print_recipe": menuPrintToFile()
             case "quit_app": menuExitApp()
             case "new_recipe": menuRecipeNew()
+            case "save_yield": menuIngredientSave()
     
     def _addRecipe(window, recipe):
         nonlocal recipe_book
@@ -417,10 +452,12 @@ def app():
         if selected_recipe:
             recipemenu.entryconfig("Add Ingredient", state="normal")
             recipemenu.entryconfig("Remove Recipe", state="normal")
+            recipemenu.entryconfig("Save Recipe", state="normal")
             filemenu.entryconfig("Print To File", state="normal")
         if not selected_recipe:
             recipemenu.entryconfig("Add Ingredient", state="disabled")
-            recipemenu.entryconfig("Remove Recipe", state="disabled")    
+            recipemenu.entryconfig("Remove Recipe", state="disabled")
+            recipemenu.entryconfig("Save Recipe", state="disabled")    
             filemenu.entryconfig("Print To File", state="disabled")
         
     # App variables
@@ -452,6 +489,7 @@ def app():
     recipemenu = tk.Menu(menubar, tearoff=0)
     recipemenu.add_command(label="Add Ingredient", command=menuIngredientAdd)
     recipemenu.add_command(label="Edit Ingredient", command=menuIngredientEdit)
+    recipemenu.add_command(label="Save Recipe", command=menuIngredientSave, accelerator="Ctrl+y")
     recipemenu.add_command(label="Remove Ingredient", command=menuIngredientRemove)
     recipemenu.add_separator()
     recipemenu.add_command(label="New Recipe", command=menuRecipeNew, accelerator="Ctrl+r")
@@ -472,6 +510,7 @@ def app():
     root.bind_all('<Control-p>', lambda event: menuEvent(event, "print_recipe"))
     root.bind_all('<Control-q>', lambda event: menuEvent(event, "quit_app"))
     root.bind_all('<Control-r>', lambda event: menuEvent(event, "new_recipe"))
+    root.bind_all('<Control-y>', lambda event: menuEvent(event, "save_yield"))
     
     # panel frames
     panel_recipes_list = tk.Frame(root)
@@ -514,6 +553,9 @@ def app():
     current_recipe.column("units", width=10)
     current_recipe.column("cost", width=10)
     
+    lbl_recipe_instruction = tk.Label(panel_current_recipe, text="Recipe Instructions:", padx=2, pady=2)
+    text_recipe_instruction = tk.Text(panel_current_recipe, wrap=tk.WORD, padx=3, pady=3)
+    
     # Widget Event Binds
     recipes_list.bind("<<TreeviewSelect>>", onRecipeSelected)
     current_recipe.bind("<<TreeviewSelect>>", onIngredientSelected)
@@ -524,7 +566,10 @@ def app():
     ent_current_yield.grid(stick="se", row=0, column=2, padx=2, pady=2)
     
     recipes_list.pack(fill=tk.BOTH, expand=True)
+    
     current_recipe.pack(fill=tk.BOTH, expand=True)
+    lbl_recipe_instruction.pack(fill=tk.X)
+    text_recipe_instruction.pack(fill=tk.BOTH, expand=True)
     
     # Pack panels to main window
     panel_recipe_info.grid(sticky="nsew", row=0, column=1, padx=2, pady=2)

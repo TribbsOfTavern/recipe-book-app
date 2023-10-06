@@ -2,19 +2,19 @@
     "Stream Chat Stew": [
         {
             "name": "Diced Chatters",
-            "amount": "2",
+            "amount": "4.0",
             "unit": "Handful",
             "cost": "limitless"
         },
         {
             "name": "Fresh Raiders",
-            "amount": "3",
+            "amount": "6.0",
             "unit": "Scoops",
             "cost": "priceless"
         },
         {
             "name": "Ground Lurkers",
-            "amount": "4",
+            "amount": "8.0",
             "unit": "Scoop",
             "cost": "more than I have"
         }
@@ -34,7 +34,10 @@
         }
     ],
     "_yields": {
-        "Stream Chat Stew": 4,
+        "Stream Chat Stew": "8",
         "Some Recipe": 2
+    },
+    "_steps": {
+        "Stream Chat Stew": "You'll want to fry the lurkers a bit before hand.\n\nToss all ingredients into the boiling chat and bring the heat.\n\nAfter a few hours you will have a tasty Stream Chat Stew.\n"
     }
 }
