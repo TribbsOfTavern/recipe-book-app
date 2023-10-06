@@ -46,6 +46,8 @@ def app():
 
     def menuOpenBook():
         nonlocal recipe_book
+        nonlocal ent_current_yield
+        
         filepath = filedialog.askopenfilename(
             initialdir="./",
             filetypes=[("Recipe Book File (.rbook)", "*.rbook")]
@@ -192,7 +194,7 @@ def app():
         btn_add = tk.Button(panel_controls, text="Update Ingredient",
             command=lambda: _updateIngredient(
                 window,
-                constructIngredent(ent_ingredient.get(), ent_amount.get(), ent_units(), ent_cost())
+                constructIngredent(ent_ingredient.get(), ent_amount.get(), ent_units.get(), ent_cost.get())
             )
         )
         btn_add.grid_propagate(True)
@@ -274,13 +276,15 @@ def app():
     def updateRecipeList():
         recipes_list.delete(*recipes_list.get_children())
         for recipe in recipe_book:
-            recipes_list.insert("", tk.END, values=(recipe,))
+            if recipe != "_yields":
+                recipes_list.insert("", tk.END, values=(recipe,))
     
     def updateCurrentRecipe():
         nonlocal selected_recipe
         nonlocal recipe_book
         nonlocal current_recipe
         nonlocal lbl_current_recipe
+        nonlocal ent_current_yield
         
         current_recipe.delete(*current_recipe.get_children())
         for ingredient in recipe_book[selected_recipe]:
@@ -289,6 +293,8 @@ def app():
             )
         text = f"Current Recipe: {selected_recipe}"
         lbl_current_recipe.config(text=text)
+        ent_current_yield.delete(0, tk.END)
+        ent_current_yield.insert(0, recipe_book["_yields"][selected_recipe])    
             
     def onRecipeSelected(event):
         nonlocal selected_recipe
@@ -349,6 +355,24 @@ def app():
         
         window.destroy()
         updateCurrentRecipe()
+    
+    def _updateAmountsBasedOnYield(*args):
+        nonlocal selected_recipe
+        nonlocal recipe_book
+        nonlocal ent_current_yield
+        nonlocal current_recipe
+        
+        if _validateYieldEntry(ent_current_yield.get()):
+            base_yield = float(recipe_book["_yields"][selected_recipe])
+            new_yield = float(ent_current_yield.get())
+            
+            for id in current_recipe.get_children():
+                new_amount = (float(recipe_book[selected_recipe][current_recipe.index(id)]['amount']) / base_yield) * new_yield
+                current_recipe.set(id, 'amount', new_amount)
+    
+    def _validateYieldEntry(input):
+        if input.isdigit(): return True
+        else: return False
     
     def updateMenuStates():
         if selected_ingredient:
@@ -418,9 +442,16 @@ def app():
     panel_current_recipe = tk.Frame(root)
     panel_current_recipe.grid_propagate(True)
     
+    panel_recipe_info = tk.Frame(root)
+    panel_recipe_info.propagate(True)
+    panel_recipe_info.columnconfigure(0, weight=1)
+    
     # widgets
-    lbl_current_recipe = tk.Label(root, text="Selected Recipe:")
-    lbl_current_recipe.grid_propagate(True)
+    lbl_current_recipe = tk.Label(panel_recipe_info, text="Selected Recipe:")
+    lbl_yield = tk.Label(panel_recipe_info, text="Yield:")
+    ent_traced_yield = tk.StringVar()
+    ent_traced_yield.trace_add("write", _updateAmountsBasedOnYield)
+    ent_current_yield = tk.Entry(panel_recipe_info, width=5, textvariable=ent_traced_yield)
     
     recipes_list = ttk.Treeview(
         panel_recipes_list, 
@@ -449,12 +480,16 @@ def app():
     recipes_list.bind("<<TreeviewSelect>>", onRecipeSelected)
     current_recipe.bind("<<TreeviewSelect>>", onIngredientSelected)
     
-    # Pack widgets to their panels    
+    # Pack widgets to their panels
+    lbl_current_recipe.grid(sticky="sw", row=0, column=0, padx=2, pady=2)
+    lbl_yield.grid(sticky="sw", row=0, column=1, padx=2, pady=2)
+    ent_current_yield.grid(stick="se", row=0, column=2, padx=2, pady=2)
+    
     recipes_list.pack(fill=tk.BOTH, expand=True)
     current_recipe.pack(fill=tk.BOTH, expand=True)
     
     # Pack panels to main window
-    lbl_current_recipe.grid(sticky="sw", row=0, column=1, padx=2, pady=2)
+    panel_recipe_info.grid(sticky="nsew", row=0, column=1, padx=2, pady=2)
     panel_recipes_list.grid(sticky="nsew", row=1, column=0, padx=2, pady=2)
     panel_current_recipe.grid(sticky="nsew", row=1, column=1, padx=2, pady=2)
     

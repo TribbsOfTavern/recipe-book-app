@@ -2,8 +2,8 @@
     "Stream Chat Stew": [
         {
             "name": "Diced Chatters",
-            "amount": "Handful",
-            "unit": "2",
+            "amount": "2",
+            "unit": "Handful",
             "cost": "limitless"
         },
         {
@@ -32,5 +32,9 @@
             "unit": "cup",
             "cost": "2"
         }
-    ]
+    ],
+    "_yields": {
+        "Stream Chat Stew": 4,
+        "Some Recipe": 2
+    }
 }
